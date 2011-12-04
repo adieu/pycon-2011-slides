@@ -97,7 +97,7 @@ body {
 }
 
 .slides.template-default > article:not(.nobackground):not(.biglogo) {
-  background: url(images/google-logo-small.png) 710px 625px no-repeat;  
+  background: url(images/pycon-china-logo.png) 750px 575px no-repeat;
   
   background-color: white;  
 } 
@@ -155,7 +155,7 @@ body {
 /* Slide styles */
 
 .slides.template-default article.biglogo {
-  background: white url(images/google-logo.png) 50% 50% no-repeat;
+  background: white url(images/PyConChina.png) 50% 50% no-repeat;
 }
 
 .slides.template-io2011 article.biglogo {
@@ -468,6 +468,12 @@ article.fill img {
 
   z-index: -1;
 }
+
+video.centered {
+  margin: 0 auto;
+  display: block;
+}
+
 img.centered {
   margin: 0 auto;
   display: block;
@@ -610,3 +616,10 @@ article.smaller q::after {
 .prettyprint .var { /* a declaration; a variable name */
   color: rgb(127, 0, 127);
 }  
+
+.fullscreen{
+	position:absolute;
+	left:0; right:0; top:0; bottom:0;
+	width:100%; height:100%;
+	overflow:hidden;
+}

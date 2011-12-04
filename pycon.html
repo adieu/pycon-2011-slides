@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<!--
+  Google HTML5 slide template
+
+  Authors: Luke Mahé (code)
+           Marcin Wichary (code and design)
+           
+           Dominic Mazzoni (browser compatibility)
+           Charles Chen (ChromeVox support)
+
+  URL: http://code.google.com/p/html5slides/
+-->
+
+<html>
+  <head>
+    <title>用Python改进迅雷离 - A Python Successful Story</title>
+
+    <meta charset='utf-8'>
+    <script
+      src='./slides.js'></script>
+  </head>
+  
+  <style>
+    /* Your individual styles here, or just use inline styles if that’s
+       what you want. */
+    
+    
+  </style>
+  
+
+  <body style='display: none'>
+
+    <section class='slides layout-regular template-default'>
+      
+      <!-- Your slides (<article>s) go here. Delete or comment out the
+           slides below. -->
+        
+        
+      
+      <article class='biglogo'>
+      </article>
+
+      <article>
+        <h1>
+          用Python改进迅雷离线
+          <br>
+          A Python Successful Story
+        </h1>
+        <p>
+          Adieu
+          <br>
+          Dec 4, 2011
+        </p>
+      </article>
+
+      <article>
+          <h3>
+            About Me
+          </h3>
+          <p><img class="centered" src="images/adieu-pic.png" /></p>
+          <ul>
+            <li>
+              从2007年开始使用Python
+            </li>
+            <li>
+              主要使用Python + Django进行网站开发
+            </li>
+            <li>
+              平时也使用Python做点兴趣项目
+            </li>
+          </ul>
+      </article>
+      
+      <article>
+          <h3>
+            迅雷离线简介
+          </h3>
+          <p><img class="centered" src="images/xunlei.png" /></p>
+          <ul class="build">
+            <li>
+              迅雷网络旗下一款下载辅助系统
+            </li>
+            <li>
+              用户不直接下载，而是让迅雷代为下载，待下载完成后，从迅雷的服务器下载文件到本地
+            </li>
+            <li>
+              由于需要下载的文件可能已经被迅雷离线缓存，另外到迅雷离线的网速很快，所以使用迅雷离线能够很大程度上提高下载速度
+            </li>
+          </ul>
+      </article>
+
+      <article>
+        <h3>
+          迅雷离线不完美之处
+        </h3>
+        <ul class="build">
+          <li>
+            一个视频文件下载到迅雷离线后，需要先下载到本地才能播放
+          </li>
+          <li>
+            只能使用浏览器或者迅雷下载工具将文件下载到本地
+          </li>
+        </ul>
+      </article>
+      
+      <article class='fill'>
+        <h2 class="white">
+          Python comes to the rescue
+        </h2>
+        <p>
+          <img src='images/Ball_Python_Royal_Python_Snake.jpg'>
+        </p>
+      </article>
+      
+      <article class='fill'>
+        <h3>
+          改进1: 用Python写XBMC的插件，从迅雷点播视频文件 
+        </h3>
+        <p>
+            <video id="movie" width="95%" class='centered' src="./video.mov" controls="controls" />
+        </p>
+      </article>
+      
+      <article class="smaller">
+        <h3>
+          用到的Python库
+        </h3>
+        <ul>
+          <li>
+            mechanize 用于模拟浏览器，向迅雷服务器发送请求
+          </li>
+          <li>
+            BeautifulSoup 用于解析返回的页面
+          </li>
+        </ul>
+        <section>
+            <pre class="lang-python">
+browser = mechanize.UserAgent()
+cj = mechanize.LWPCookieJar()
+try:
+    cj.load(COOKIE_FILE, ignore_discard=True, ignore_expires=True)
+except IOError:
+    pass
+browser.set_cookiejar(cj)
+browser.addheaders = [
+    ('User-agent', USER_AGENT),
+]
+...
+response = browser.open(url, data)
+...
+page = BeautifulSoup(response.read())
+raw_items = page.findAll('div', attrs={'class':'rw_list'})
+            </pre>
+        </section>
+      </article>
+      
+      <article class='smaller'>
+          <h3>
+            改进2: 用Python脚本下载迅雷离线上的文件
+          </h3>
+          <section>
+          <pre class="lang-sh">
+mba ~: xunlei_cli download -h
+Usage: 
+    xunlei_cli download <task_id> [--option] - download task from xunlei
+    
+    Set global settings in ~/.xunleirc or pass in settings from cmd line.
+
+Options:
+  -h, --help            show this help message and exit
+  -u USERNAME, --username=USERNAME
+                        xunlei username
+  -p PASSWORD, --password=PASSWORD
+                        xunlei password
+  -c COOKIE_FILE, --cookie-file=COOKIE_FILE
+                        file to store cookies. default is ~/.xunlei_cookie
+  -w, --wait            wait for input before exit
+          </pre>
+          </section>
+        </article>
+        <article class="smaller">
+          <h3>
+            用到的Python库
+          </h3>
+          <ul>
+            <li>
+              optfunc 用于简化命令行参数解析
+            </li>
+          </ul>
+          <section>
+              <pre class="lang-python">
+@optfunc.arghelp('cookie_file', 'file to store cookies. default is ~/.xunlei_cookie')
+@optfunc.arghelp('password', 'xunlei password')
+@optfunc.arghelp('username', 'xunlei username')
+def dashboard(username=None, password=None, cookie_file=None):
+    """Usage: %prog dashboard - list tasks from xunlei"""
+    xunlei_obj = get_xunlei(username, password, cookie_file)
+    items = xunlei_obj.dashboard()
+    for (index, item) in enumerate(items):
+        print index, item['name']
+              </pre>
+          </section>
+        </article>
+        <article class="fill">
+            <h2 class="white">
+              One more thing...
+            </h2>
+            <p>
+              <img src='images/steve-jobs1.jpg'>
+            </p>
+        </article>
+
+        <article>
+            <h1>
+              迅雷离线的非常规用法
+            </h1>
+          </article>
+
+        <article>
+            <h3>
+              两个ADSL用户如何快速分享大文件
+            </h3>
+            <ul class="build">
+              <li>
+                高下载速度，低上传速度
+              </li>
+              <li>
+                QQ对传?
+              </li>
+              <li>
+                移动硬盘交换?
+              </li>
+              <li>
+                迅雷离线是发送大文件的好工具
+              </li>
+            </ul>
+          </article>
+
+        <article>
+            <h3>
+              改进3: 用Python脚本结合迅雷离线发送大文件
+            </h3>
+            <ul class="build">
+              <li>
+                发送者用Python脚本计算文件的ed2k链接
+              </li>
+              <li>
+                将计算好的ed2k链接发送给接收者
+              </li>
+              <li>
+                接收者使用迅雷离线下载
+              </li>
+              <li>
+                配合点播与命令行下载效果更佳
+              </li>
+            </ul>
+          </article>
+          <article class='smaller'>
+                  <h3>
+                    用Python计算ed2k链接
+                  </h3>
+                  <section>
+                  <pre class="lang-python">
+def hash_filehash(filename):
+    """ Returns the ed2k hash of a given file. """
+
+    md4 = hashlib.new('md4').copy
+
+    def gen(f):
+        while True:
+            x = f.read(9728000)
+            if x: yield x
+            else: return
+
+    def md4_hash(data):
+        m = md4()
+        m.update(data)
+        return m
+
+    with open(filename, 'rb') as f:
+        a = gen(f)
+        hashes = [md4_hash(data).digest() for data in a]
+        if len(hashes) == 1:
+            return hashes[0].encode("hex")
+        else: return md4_hash(reduce(lambda a,d: a + d, hashes, "")).hexdigest()</pre>
+                  </section>
+                  <div class='source'>
+                    Source: http://www.radicand.org/edonkey2000-hash-in-python/
+                  </div>
+            </article>
+      <article>
+        <h3>
+          谢谢
+        </h3>
+        <p>源码地址</p>
+        <ul>
+          <li>
+            <a href='https://github.com/adieu/xunlei'>https://github.com/adieu/xunlei</a>
+          </li>
+          <li>
+            <a href='https://github.com/adieu/xbmc-xunlei'>https://github.com/adieu/xbmc-xunlei</a>
+          </li>
+        </ul>
+      </article>
+
+    </section>
+
+  </body>
+</html>
